@@ -1,0 +1,30 @@
+name: Build and Deploy GitHub Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build-deploy-gh-pages:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - id: fetch-metadata
+        run: |
+          username=$(echo "${GITHUB_REPOSITORY}" | cut -d'/' -f2 | cut -d'-' -f2-)
+          echo "username=$username" >> $GITHUB_OUTPUT
+          
+      - name: Build and Deploy GitHub Pages
+        uses: glnk-dev/webapp@main
+        with:
+          GLNK_USERNAME: ${{ steps.fetch-metadata.outputs.username }}
